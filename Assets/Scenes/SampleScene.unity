@@ -2218,8 +2218,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bb2a8d0926695a40a54126cf23f5b57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panelRoot: {fileID: 0}
-  blocker: {fileID: 0}
+  panelRoot: {fileID: 95127709}
+  blocker: {fileID: 1385403303}
   lockCursorOnClose: 1
 --- !u!114 &1417072015
 MonoBehaviour:
