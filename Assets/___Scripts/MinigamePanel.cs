@@ -1,27 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class MinigamePanel : MonoBehaviour
 {
     [Header("Root")]
-    [SerializeField] private GameObject panelRoot;
+    [SerializeField] private GameObject _panelRoot;
 
     [Header("Blocker")]
-    [SerializeField] private GameObject blocker;
+    [SerializeField] private GameObject _blocker;
 
     [Header("Cursor")]
-    [SerializeField] private bool lockCursorOnClose = true;
+    [SerializeField] private bool _lockCursorOnClose = true;
 
     public bool IsOpen { get; private set; }
 
     void Awake()
     {
-        if (panelRoot == null) panelRoot = gameObject;
-        panelRoot.SetActive(false);
+        if (_panelRoot == null) _panelRoot = gameObject;
+        _panelRoot.SetActive(false);
 
-        if (blocker != null) blocker.SetActive(false);
+        if (_blocker != null) _blocker.SetActive(false);
     }
 
     public void Open()
@@ -29,8 +27,8 @@ public class MinigamePanel : MonoBehaviour
         if (IsOpen) return;
         IsOpen = true;
 
-        if (blocker != null) blocker.SetActive(true);
-        panelRoot.SetActive(true);
+        if (_blocker != null) _blocker.SetActive(true);
+        _panelRoot.SetActive(true);
 
         PlayerMovement.InputBlocked = true;
 
@@ -43,12 +41,12 @@ public class MinigamePanel : MonoBehaviour
         if (!IsOpen) return;
         IsOpen = false;
 
-        panelRoot.SetActive(false);
-        if (blocker != null) blocker.SetActive(false);
+        _panelRoot.SetActive(false);
+        if (_blocker != null) _blocker.SetActive(false);
 
         PlayerMovement.InputBlocked = false;
 
-        if (lockCursorOnClose)
+        if (_lockCursorOnClose)
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;

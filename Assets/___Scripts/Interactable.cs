@@ -10,9 +10,9 @@ public class Interactable : MonoBehaviour
 
     [Header("Prompt (optional)")]
     [Tooltip("Текст подсказки, если будешь показывать UI-подсказку")]
-    [SerializeField] private string promptText = "Нажми E";
+    [SerializeField] private string _promptText = "Нажми E";
 
-    public string PromptText => promptText;
+    public string PromptText => _promptText;
 
     public void Interact()
     {
