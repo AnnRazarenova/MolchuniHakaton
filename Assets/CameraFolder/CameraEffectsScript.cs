@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraEffectsScript : MonoBehaviour
 {
-    public virtual CameraEffectsScript singleton { get; private set; }
+    public static CameraEffectsScript singleton { get; private set; }
 
     [SerializeField]
     private Material camMaterial;
