@@ -1,13 +1,13 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-public enum MinigameType { Shapes, Wires, Fire, RapidClick } // Добавляем новые типы
+public enum MinigameType { Shapes, Wires, Fire, RapidClick }
 
 public class Interactable : MonoBehaviour
 {
     [Header("Minigame Settings")]
     [SerializeField] private MinigameType _minigameType;
 
-    // Ссылки на панели мини-игр (перетащить в инспекторе)
     [SerializeField] private MinigamePanel _shapesPanel;
     [SerializeField] private MinigamePanel _wiresPanel;
     [SerializeField] private MinigamePanel _firePanel;
@@ -26,11 +26,11 @@ public class Interactable : MonoBehaviour
     {
         isBroken = !fixedState;
 
+        // ВМЕСТО СТАРОЙ СТРОКИ ВЫЗЫВАЕМ НОВЫЙ МЕТОД
+        SetColor(isBroken ? Color.red : Color.white);
 
-        // Здесь можно менять материал детали (например, на красный, если сломана)
-        GetComponent<Renderer>().material.color = isBroken ? Color.red : Color.white;
-
-        if (isBroken) {
+        if (isBroken && _audioSource != null && _audioClip != null)
+        {
             _audioSource.PlayOneShot(_audioClip);
         }
     }
@@ -38,9 +38,8 @@ public class Interactable : MonoBehaviour
     // Вызывается из PlayerMovement по кнопке E
     public void Interact()
     {
-        if (!isBroken) return; // Если деталь цела, ничего не делаем
+        if (!isBroken) return;
 
-        // Открываем нужную мини-игру
         MinigamePanel panelToOpen = null;
         switch (_minigameType)
         {
@@ -52,7 +51,7 @@ public class Interactable : MonoBehaviour
 
         if (panelToOpen != null)
         {
-            panelToOpen.Open(this); // Передаем саму деталь в панель
+            panelToOpen.Open(this);
         }
     }
 
@@ -60,9 +59,30 @@ public class Interactable : MonoBehaviour
     public void OnFixed()
     {
         isBroken = false;
-        GetComponent<Renderer>().material.color = Color.white;
+
+        // ВМЕСТО СТАРОЙ СТРОКИ ВЫЗЫВАЕМ НОВЫЙ МЕТОД
+        SetColor(Color.white);
+
         GameFlowManager.Instance.OnPartFixed(this);
 
-        _audioSource.Stop();
+        if (_audioSource != null) _audioSource.Stop();
+    }
+
+    // НОВЫЙ МЕТОД: Ищет картинку внутри (SpriteRenderer или UI Image) и красит её
+    private void SetColor(Color color)
+    {
+        // Находим все 3D/2D спрайты внутри
+        SpriteRenderer[] sprites = GetComponentsInChildren<SpriteRenderer>();
+        foreach (var sprite in sprites)
+        {
+            sprite.color = color;
+        }
+
+        // Находим все UI картинки внутри
+        Image[] images = GetComponentsInChildren<Image>();
+        foreach (var img in images)
+        {
+            img.color = color;
+        }
     }
 }

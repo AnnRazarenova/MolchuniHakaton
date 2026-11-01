@@ -18,7 +18,17 @@ public class MinigamePanel : MonoBehaviour
         _panelRoot.SetActive(false);
         if (_blocker != null) _blocker.SetActive(false);
     }
+    public SimpleSpriteAnimator animator; // Перетащите сюда объект с анимацией в инспекторе
 
+    // В методе OnMinigameWon():
+    public void OnMinigameWon()
+    {
+        if (currentPart != null) currentPart.OnFixed();
+        Close();
+
+        // МЕНЯЕМ КАДР
+        if (animator != null) animator.NextFrame();
+    }
     public void Open(Interactable part)
     {
         currentPart = part;
@@ -59,12 +69,6 @@ public class MinigamePanel : MonoBehaviour
                 }
                 break;
         }
-    }
-
-    public void OnMinigameWon()
-    {
-        if (currentPart != null) currentPart.OnFixed();
-        Close();
     }
 
     public void Close()
