@@ -9,19 +9,28 @@ public class PlayerMovement : MonoBehaviour, PlayerControls.INewactionmapActions
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 6f;
 
+    [Header("References")]
+    [SerializeField] private SpriteRenderer _spriteRenderer;
+    [SerializeField] private Animator _animator;
+
+    [Header("Idle Sprites")]
+    [SerializeField] private Sprite _idleForward;
+    [SerializeField] private Sprite _idleBackward;
+    [SerializeField] private Sprite _idleSide;
+
     [Header("Interaction")]
-    [SerializeField] private float interactRadius = 2.5f;
+    [SerializeField] private float interactRadius = 1f;
     [SerializeField] private LayerMask interactableMask = ~0;
 
     private Interactable nearestInteractable;
-
     private Rigidbody rb;
     private PlayerControls controls;
     private Vector2 moveInput;
     private bool jumpPressed;
     private bool grounded;
 
-    // ---------- Lifecycle ----------
+    // Текущее направление взгляда (для Idle)
+    private Vector2 lastDir = Vector2.down;
 
     void Awake()
     {
@@ -35,8 +44,6 @@ public class PlayerMovement : MonoBehaviour, PlayerControls.INewactionmapActions
 
     void OnEnable() => controls.Newactionmap.Enable();
     void OnDisable() => controls.Newactionmap.Disable();
-
-    // ---------- Input System callbacks ----------
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
@@ -57,8 +64,6 @@ public class PlayerMovement : MonoBehaviour, PlayerControls.INewactionmapActions
             nearestInteractable.Interact();
     }
 
-    // ---------- Per-frame ----------
-
     void Update()
     {
         if (InputBlocked)
@@ -68,14 +73,54 @@ public class PlayerMovement : MonoBehaviour, PlayerControls.INewactionmapActions
         }
 
         UpdateNearestInteractable();
-        grounded = Physics.Raycast(transform.position, Vector3.down, 0.15f);
+        grounded = Physics.Raycast(transform.position, Vector3.down, 0.15f, ~LayerMask.GetMask("UI", "Ignore Raycast"));
+
+        bool isMoving = moveInput.sqrMagnitude > 0.1f;
+
+        if (isMoving)
+        {
+            lastDir = moveInput.normalized;
+
+            // Включаем Animator, чтобы он проигрывал ходьбу
+            _animator.enabled = true;
+
+            _animator.SetFloat("MoveX", moveInput.x);
+            _animator.SetFloat("MoveY", moveInput.y);
+            _animator.SetBool("IsMoving", true);
+
+            if (Mathf.Abs(moveInput.x) > Mathf.Abs(moveInput.y))
+            {
+                _spriteRenderer.flipX = (moveInput.x < 0);
+            }
+        }
+        else
+        {
+            // ВЫКЛЮЧАЕМ Animator, чтобы он не мешал менять спрайт через код!
+            _animator.enabled = false;
+
+            // И теперь спокойно ставим нужный Idle-спрайт
+            if (Mathf.Abs(lastDir.x) > 0.1f && Mathf.Abs(lastDir.x) > Mathf.Abs(lastDir.y))
+            {
+                _spriteRenderer.sprite = _idleSide;
+                _spriteRenderer.flipX = (lastDir.x < 0);
+            }
+            else if (lastDir.y > 0.1f)
+            {
+                _spriteRenderer.sprite = _idleBackward;
+                _spriteRenderer.flipX = false;
+            }
+            else
+            {
+                _spriteRenderer.sprite = _idleForward;
+                _spriteRenderer.flipX = false;
+            }
+        }
     }
 
     void FixedUpdate()
     {
         if (InputBlocked)
         {
-            // Гасим горизонталь, оставляем вертикаль (падение)
             rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
             jumpPressed = false;
             return;
@@ -86,13 +131,12 @@ public class PlayerMovement : MonoBehaviour, PlayerControls.INewactionmapActions
 
         Vector3 vel = move * moveSpeed;
         vel.y = rb.velocity.y;
+
         if (jumpPressed && grounded) vel.y = jumpForce;
 
         rb.velocity = vel;
         jumpPressed = false;
     }
-
-    // ---------- Interaction search ----------
 
     private void UpdateNearestInteractable()
     {
