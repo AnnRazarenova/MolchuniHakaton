@@ -13,6 +13,10 @@ public class Interactable : MonoBehaviour
     [SerializeField] private MinigamePanel _firePanel;
     [SerializeField] private MinigamePanel _rapidClickPanel;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _audioClip;
+
     private bool isBroken = false;
 
     public MinigameType MinigameType => _minigameType;
@@ -21,8 +25,14 @@ public class Interactable : MonoBehaviour
     public void SetFixed(bool fixedState)
     {
         isBroken = !fixedState;
+
+
         // Здесь можно менять материал детали (например, на красный, если сломана)
         GetComponent<Renderer>().material.color = isBroken ? Color.red : Color.white;
+
+        if (isBroken) {
+            _audioSource.PlayOneShot(_audioClip);
+        }
     }
 
     // Вызывается из PlayerMovement по кнопке E
@@ -52,5 +62,7 @@ public class Interactable : MonoBehaviour
         isBroken = false;
         GetComponent<Renderer>().material.color = Color.white;
         GameFlowManager.Instance.OnPartFixed(this);
+
+        _audioSource.Stop();
     }
 }

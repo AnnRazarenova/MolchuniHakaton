@@ -13,6 +13,9 @@ public class WireDrag : MonoBehaviour,
     public bool isPlaced = false;
     private Vector2 startPosition;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource _audioSource;
+
     private void Awake() {
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
@@ -50,6 +53,8 @@ public class WireDrag : MonoBehaviour,
 
         if (distance <= snapDistance) {
             PlaceShape();
+
+            _audioSource.Play();
         }
     }
 

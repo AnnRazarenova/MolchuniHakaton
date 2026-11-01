@@ -22,6 +22,9 @@ public class PlayerMovement : MonoBehaviour, PlayerControls.INewactionmapActions
     [SerializeField] private float interactRadius = 1f;
     [SerializeField] private LayerMask interactableMask = ~0;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource _stepAudioSource;
+
     private Interactable nearestInteractable;
     private Rigidbody rb;
     private PlayerControls controls;
@@ -73,9 +76,16 @@ public class PlayerMovement : MonoBehaviour, PlayerControls.INewactionmapActions
         }
 
         UpdateNearestInteractable();
-        grounded = Physics.Raycast(transform.position, Vector3.down, 0.15f, ~LayerMask.GetMask("UI", "Ignore Raycast"));
+        grounded = Physics.Raycast(transform.position, Vector3.down, 1.15f, ~LayerMask.GetMask("UI", "Ignore Raycast"));
 
         bool isMoving = moveInput.sqrMagnitude > 0.1f;
+
+        if (isMoving && grounded) {
+            if(!_stepAudioSource.isPlaying)
+                _stepAudioSource.Play();
+        } else {
+            _stepAudioSource.Stop();
+        }
 
         if (isMoving)
         {

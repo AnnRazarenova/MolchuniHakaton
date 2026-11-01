@@ -23,6 +23,8 @@ public class FireExtinguisherDrag : MonoBehaviour, IPointerDownHandler, IDragHan
         isDragging = true;
         if (_sprayFoamImage != null)
             _sprayFoamImage.gameObject.SetActive(true);
+
+        GetComponent<AudioSource>().Play();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -46,6 +48,8 @@ public class FireExtinguisherDrag : MonoBehaviour, IPointerDownHandler, IDragHan
         isDragging = false;
         if (_sprayFoamImage != null)
             _sprayFoamImage.gameObject.SetActive(false);
+
+        GetComponent<AudioSource>().Stop();
     }
 
     private void CheckForFire(Vector2 screenPosition)

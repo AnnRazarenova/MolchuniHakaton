@@ -13,6 +13,9 @@ public class ShapeDrag : MonoBehaviour,
 
     public bool isPlaced = false;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource _audioSource;
+
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -46,6 +49,7 @@ public class ShapeDrag : MonoBehaviour,
         {
             isPlaced = true;
             rectTransform.position = targetHole.position;
+            _audioSource.Play();
 
             // Сообщаем менеджеру, что фигура встала на место
             ShapeGameManager.singleton.OnShapePlaced();
